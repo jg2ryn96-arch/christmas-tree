@@ -367,8 +367,8 @@
       //获取页面的宽度，利用这个数来算出，雪花开始时left的值
       var documentWidth = window.innerWidth;
 
-      //定义生成一片雪花的毫秒数
-      var millisec = 100;
+      //定义生成一片雪花的毫秒数（数值越小，雪花越密集）
+      var millisec = 50;
       //2、设置第一个定时器，周期性定时器，每隔一段时间（millisec）生成一片雪花；
       setInterval(function () {
         //页面加载之后，定时器就开始工作
@@ -741,29 +741,33 @@ function drawStars() {
       }
 
       var Star = function () {
-        //星星移动的半径
-        this.orbitRadius = random(maxOrbit(w, h));
-        //星星大小，半径越小，星星也越小，即外面的星星会比较大
-        this.radius = random(60, this.orbitRadius) / 8;
-        //所有星星都是以屏幕的中心为圆心
-        this.orbitX = w / 2;
-        this.orbitY = h / 2;
-        //星星在旋转圆圈位置的角度,每次增加speed值的角度
-        //利用正弦余弦算出真正的x、y位置
-        this.timePassed = random(0, maxStars);
-        //星星移动速度
-        this.speed = random(this.orbitRadius) / 50000;
-        //星星图像的透明度
-        this.alpha = random(2, 10) / 10;
+        this.reset();
 
         count++;
         stars[count] = this;
       };
 
+      Star.prototype.reset = function () {
+        //星星移动的半径
+        this.orbitRadius = random(maxOrbit(w, h));
+        //星星大小，半径越小，星星也越小，即外面的星星会比较大
+        this.radius = random(60, this.orbitRadius) / 8;
+        //所有星星都是以屏幕的中心为圆心
+        this.orbitX = random(0, w);
+        this.orbitY = random(-h, 0);
+        //星星在旋转圆圈位置的角度,每次增加speed值的角度
+        //利用正弦余弦算出真正的x、y位置
+        this.timePassed = 0;
+        //星星移动速度
+        this.speed = random(50, 200) / 100;
+        //星星图像的透明度
+        this.alpha = random(2, 10) / 10;
+      };
+
       Star.prototype.draw = function () {
         //星星围绕在以屏幕中心为圆心，半径为orbitRadius的圆旋转
-        var x = Math.sin(this.timePassed) * this.orbitRadius + this.orbitX,
-          y = Math.cos(this.timePassed) * this.orbitRadius + this.orbitY,
+        var x = this.orbitX,
+          y = this.orbitY + this.timePassed,
           twinkle = random(10);
 
         //星星每次移动会有1/10的几率变亮或者变暗
@@ -788,6 +792,10 @@ function drawStars() {
         );
         //没旋转一次，角度就会增加
         this.timePassed += this.speed;
+
+        if (y - this.radius > h) {
+          this.reset();
+        }
       };
 
       //初始化所有星星
@@ -818,7 +826,7 @@ function drawStars() {
 
 
     let myLabels = [
-      "xx宝贝",
+      "小林",
       "Merry Christmas",
       "健健康康，平安喜乐",
       "一定要站在你所热爱的世界里闪闪发光",
